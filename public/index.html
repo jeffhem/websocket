@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Tahoma, Geneva, sans-serif;
+      }
+      div {
+        display: inline;
+      }
+    </style>
+    <script>
+      function updateStats(data) {
+        document.getElementById('upTime').innerHTML = data.upTime + ' s';
+        document.getElementById('rss').innerHTML = (data.memUse.rss);
+        document.getElementById('heapTotal').innerHTML = data.memUse.heapTotal;
+        document.getElementById('heapUsed').innerHTML = data.memUse.heapUsed;
+      }
+      var host = window.document.location.host.replace(/:.*/, '');
+      var ws = new WebSocket('ws://' + host + ':8080');
+      ws.onmessage = function (event) {
+        updateStats(JSON.parse(event.data));
+      };
+      document.addEventListener('click', function(evt) {
+          switch(evt.target.id) {
+                case 'startBtn':
+                    ws.send('start');
+                    break;
+                case 'stopBtn':
+                    ws.send('stop');
+                    break;
+          }
+      })
+    </script>
+  </head>
+  <body>
+    <strong>Server Stats</strong><br>
+    Uptime: <div id='upTime'></div><br><br>
+    ==== memory usage ====<br>
+    RSS: <div id='rss'></div><br>
+    Heap total: <div id='heapTotal'></div><br>
+    Heap used: <div id='heapUsed'></div><br>
+
+    <button id="startBtn">start</button>
+    <button id="stopBtn">stop</button>
+  </body>
+</html>
